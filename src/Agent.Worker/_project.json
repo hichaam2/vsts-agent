@@ -39,6 +39,7 @@
         "System.Diagnostics.TraceSource": "4.0.0",
         "System.Linq": "4.1.0",
         "System.IO.Compression.ZipFile": "4.0.1",
+        "System.IO.FileSystem.DriveInfo": "4.0.0",
         "System.Security.Cryptography.Algorithms": "4.2.0",
         "System.Security.Cryptography.Primitives": "4.0.0",
         "System.Security.Cryptography.ProtectedData": "4.0.0",

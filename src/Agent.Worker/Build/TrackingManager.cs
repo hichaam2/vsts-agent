@@ -3,6 +3,9 @@ using Microsoft.VisualStudio.Services.Agent.Util;
 using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 {
@@ -20,6 +23,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
         void MarkForGarbageCollection(IExecutionContext executionContext, TrackingConfigBase config);
 
         void UpdateJobRunProperties(IExecutionContext executionContext, TrackingConfig config, string file);
+
+        void DiscoverExpiredGarbage(IExecutionContext executionContext, TimeSpan expiration);
+
+        void DisposeCollectedGarbage(IExecutionContext executionContext);
     }
 
     public sealed class TrackingManager : AgentService, ITrackingManager
@@ -135,6 +142,111 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             // Update the info properties and save the file.
             config.UpdateJobRunProperties(executionContext);
             WriteToFile(file, config);
+        }
+
+        public void DiscoverExpiredGarbage(IExecutionContext executionContext, TimeSpan expiration)
+        {
+            Trace.Entering();
+            Trace.Info("Scan all SourceFolder tracking files.");
+            string searchRoot = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Work), Constants.Build.Path.SourceRootMappingDirectory);
+            if (!Directory.Exists(searchRoot))
+            {
+                executionContext.Output($"SourceRootMapping directory '{searchRoot}' doesn't exist, skip garbage discovery.");
+                return;
+            }
+
+            var allTrackingFiles = Directory.EnumerateFiles(searchRoot, Constants.Build.Path.TrackingConfigFile, SearchOption.AllDirectories);
+            Trace.Verbose($"Find {allTrackingFiles.Count()} tracking files.");
+
+            executionContext.Output($"Directory expiration limit: {expiration.TotalDays} days.");
+            executionContext.Output($"Current UTC: {DateTime.UtcNow.ToString("o")}");
+
+            // scan all sourcefolder tracking file, find which folder has never been used since UTC-expiration
+            // the scan and garbage discovery should be best effort.
+            // if the tracking file is in old format, just delete the folder since the first time the folder been use we will convert the tracking file to new format.
+            foreach (var trackingFile in allTrackingFiles)
+            {
+                try
+                {
+                    executionContext.Output($"Evaluate BuildDirectory tracking file: {trackingFile}");
+                    TrackingConfigBase tracking = LoadIfExists(executionContext, trackingFile);
+
+                    // detect whether the tracking file is in new format.
+                    TrackingConfig newTracking = tracking as TrackingConfig;
+                    if (newTracking == null)
+                    {
+                        LegacyTrackingConfig legacyConfig = tracking as LegacyTrackingConfig;
+                        ArgUtil.NotNull(legacyConfig, nameof(LegacyTrackingConfig));
+
+                        Trace.Verbose($"{trackingFile} is a old format tracking file.");
+
+                        executionContext.Output($"Mark tracking file '{trackingFile}' for GC, since it never been used.");
+                        MarkForGarbageCollection(executionContext, legacyConfig);
+                        IOUtil.DeleteFile(trackingFile);
+                    }
+                    else
+                    {
+                        Trace.Verbose($"{trackingFile} is a new format tracking file.");
+                        ArgUtil.NotNull(newTracking.LastRunOn, nameof(newTracking.LastRunOn));
+                        executionContext.Output($"The last time build directory '{newTracking.BuildDirectory}' been used is: {newTracking.LastRunOnString}");
+                        if (DateTime.UtcNow - expiration > newTracking.LastRunOn)
+                        {
+                            executionContext.Output($"Mark tracking file '{trackingFile}' for GC, since it hasn't been used for {expiration.TotalDays} days.");
+                            MarkForGarbageCollection(executionContext, newTracking);
+                            IOUtil.DeleteFile(trackingFile);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    executionContext.Error($"Unable discovery garbage based on '{trackingFile}'. Try it next time.");
+                    executionContext.Error(ex);
+                }
+            }
+        }
+
+        public void DisposeCollectedGarbage(IExecutionContext executionContext)
+        {
+            Trace.Entering();
+
+            string gcDirectory = Path.Combine(
+                IOUtil.GetWorkPath(HostContext),
+                Constants.Build.Path.SourceRootMappingDirectory,
+                Constants.Build.Path.GarbageCollectionDirectory);
+
+            if (!Directory.Exists(gcDirectory))
+            {
+                executionContext.Output($"No build directory need to be GC. '{gcDirectory}' doesn't exist.");
+                return;
+            }
+
+            IEnumerable<string> gcTrackingFiles = Directory.EnumerateFiles(gcDirectory, "*.json");
+            if (gcTrackingFiles == null || gcTrackingFiles.Count() == 0)
+            {
+                executionContext.Output($"No build directory need to be GC. '{gcDirectory}' doesn't have any tracking file.");
+                return;
+            }
+
+            Trace.Info($"Find {gcTrackingFiles.Count()} GC tracking files.");
+            foreach (string gcFile in gcTrackingFiles)
+            {
+                try
+                {
+                    var gcConfig = LoadIfExists(executionContext, gcFile) as TrackingConfig;
+                    ArgUtil.NotNull(gcConfig, nameof(TrackingConfig));
+
+                    executionContext.Output($"Deleting '{gcConfig.BuildDirectory}'");
+                    IOUtil.DeleteDirectory(gcConfig.BuildDirectory, CancellationToken.None);
+
+                    executionContext.Output($"Delete gc tracking file after delete '{gcConfig.BuildDirectory}'");
+                    IOUtil.DeleteFile(gcFile);
+                }
+                catch (Exception ex)
+                {
+                    executionContext.Error($"Unable finish GC based on '{gcFile}'. Try it next time.");
+                    executionContext.Error(ex);
+                }
+            }
         }
 
         private void WriteToFile(string file, object value)
