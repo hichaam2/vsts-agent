@@ -1,5 +1,5 @@
 ﻿{
-    "version": "1.0.0-*",
+    "version": "1.1.0",
     "buildOptions": {
         "emitEntryPoint": true,
         "warningsAsErrors": true
@@ -26,12 +26,12 @@
         }
     },
     "dependencies": {
-        "Microsoft.NETCore.App": "1.0.0",
-        "Microsoft.NETCore.TestHost": "1.0.0",
-        "System.Buffers": "4.0.0",
-        "System.Reflection.TypeExtensions": "4.1.0",
-        "System.Threading.ThreadPool": "4.0.10",
-        "vss-api-netcore": "0.5.28-private",
+        "Microsoft.NETCore.App": "1.1.0",
+        "Microsoft.NETCore.TestHost": "1.1.0",
+        "System.Buffers": "4.3.0",
+        "System.Reflection.TypeExtensions": "4.3.0",
+        "System.Threading.ThreadPool": "4.3.0",
+        "vss-api-netcore": "0.5.30-private",
         "Moq": "4.6.36-alpha",
         "xunit": "2.1.0",
         "xunit.console.netcore": "1.0.3-prerelease-00520-02",
@@ -39,19 +39,19 @@
         "xunit.runner.utility": "2.1.0",
         "Agent.Listener": {
             "target": "project",
-            "version": "1.0.0-*"
+            "version": "1.1.0-*"
         },
         "Microsoft.VisualStudio.Services.Agent": {
             "target": "project",
-            "version": "1.0.0-*"
+            "version": "1.1.0-*"
         },
         "Agent.Worker": {
             "target": "project",
-            "version": "1.0.0-*"
+            "version": "1.1.0-*"
         }
     },
     "frameworks": {
-        "netcoreapp1.0": {
+        "netcoreapp1.1": {
             "imports": [
                 "dnxcore50",
                 "portable-net451+win8"

@@ -1,5 +1,5 @@
 ﻿{
-    "version": "1.0.0-*",
+    "version": "1.1.0",
     "buildOptions": {
         "emitEntryPoint": true,
         "warningsAsErrors": true
@@ -29,25 +29,25 @@
         }
     },
     "dependencies": {
-        "Microsoft.NETCore.App": "1.0.0",
+        "Microsoft.NETCore.App": "1.1.0",
         "Microsoft.VisualStudio.Services.Agent": {
             "target": "project",
-            "version": "1.0.0-*"
+            "version": "1.1.0-*"
         },
-        "vss-api-netcore": "0.5.28-private",
-        "System.Collections.NonGeneric": "4.0.1",
-        "System.Diagnostics.TraceSource": "4.0.0",
-        "System.Linq": "4.1.0",
-        "System.IO.Compression.ZipFile": "4.0.1",
-        "System.Security.Cryptography.Algorithms": "4.2.0",
-        "System.Security.Cryptography.Primitives": "4.0.0",
-        "System.Security.Cryptography.ProtectedData": "4.0.0",
-        "System.Threading.Tasks.Parallel": "4.0.1",
-        "System.Xml.XmlSerializer": "4.0.11",
-        "System.Xml.XPath.XmlDocument": "4.0.1"
+        "vss-api-netcore": "0.5.30-private",
+        "System.Collections.NonGeneric": "4.3.0",
+        "System.Diagnostics.TraceSource": "4.3.0",
+        "System.Linq": "4.3.0",
+        "System.IO.Compression.ZipFile": "4.3.0",
+        "System.Security.Cryptography.Algorithms": "4.3.0",
+        "System.Security.Cryptography.Primitives": "4.3.0",
+        "System.Security.Cryptography.ProtectedData": "4.3.0",
+        "System.Threading.Tasks.Parallel": "4.3.0",
+        "System.Xml.XmlSerializer": "4.3.0",
+        "System.Xml.XPath.XmlDocument": "4.3.0"
     },
     "frameworks": {
-        "netcoreapp1.0": {
+        "netcoreapp1.1": {
             "imports": [
                 "dnxcore50",
                 "portable-net451+win8"

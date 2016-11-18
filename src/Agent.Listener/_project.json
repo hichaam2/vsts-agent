@@ -1,5 +1,5 @@
 {
-    "version": "1.0.0-*",
+    "version": "1.1.0",
     "buildOptions": {
         "emitEntryPoint": true,
         "warningsAsErrors": true
@@ -29,26 +29,26 @@
         }
     },
     "dependencies": {
-        "Microsoft.NETCore.App": "1.0.0",
+        "Microsoft.NETCore.App": "1.1.0",
         "Microsoft.VisualStudio.Services.Agent": {
             "target": "project",
-            "version": "1.0.0-*"
+            "version": "1.1.0-*"
         },
-        "Microsoft.Win32.Registry": "4.0.0",
-        "vss-api-netcore": "0.5.28-private",
-        "System.ServiceProcess.ServiceController": "4.1.0",
-        "System.IO.Compression.ZipFile": "4.0.1",
-        "System.IO.FileSystem.AccessControl": "4.0.0",
+        "Microsoft.Win32.Registry": "4.3.0",
+        "vss-api-netcore": "0.5.30-private",
+        "System.ServiceProcess.ServiceController": "4.3.0",
+        "System.IO.Compression.ZipFile": "4.3.0",
+        "System.IO.FileSystem.AccessControl": "4.3.0",
         "Newtonsoft.Json": "8.0.3",
-        "System.Diagnostics.TraceSource": "4.0.0",
-        "System.Security.AccessControl": "4.0.0",
-        "System.Runtime.InteropServices": "4.1.0",
-        "System.Security.Cryptography.Cng": "4.2.0",
-        "System.Security.Cryptography.ProtectedData": "4.0.0",
-        "System.Runtime.Loader": "4.0.0"
+        "System.Diagnostics.TraceSource": "4.3.0",
+        "System.Security.AccessControl": "4.3.0",
+        "System.Runtime.InteropServices": "4.3.0",
+        "System.Security.Cryptography.Cng": "4.3.0",
+        "System.Security.Cryptography.ProtectedData": "4.3.0",
+        "System.Runtime.Loader": "4.3.0"
     },
     "frameworks": {
-        "netcoreapp1.0": {
+        "netcoreapp1.1": {
             "imports": [
                 "dnxcore50",
                 "portable-net451+win8"
